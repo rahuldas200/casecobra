@@ -44,7 +44,7 @@ const Navbar = () => {
             )}
             <div className="h-8 w-px bg-zinc-200 hidden sm:block" />
 
-            <Link href="/configure/upload">
+            <Link href="/configure/upload" className="hidden lg:block md:block ">
               <button className=" flex gap-1 px-3 py-1 bg-black text-white rounded-sm">Create case <MoveRight/></button>
             </Link>
           </div>
