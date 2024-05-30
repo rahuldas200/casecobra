@@ -5,14 +5,34 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Dropzone, { FileRejection } from "react-dropzone";
 import { Progress } from "@/components/ui/progress";
+import { useUploadThing } from "@/lib/uploadthing";
 
 const Page = () => {
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
-  const [UploadProgess,setUploadProgress] = useState<number>(45)
+  const [UploadProgess, setUploadProgress] = useState<number>(45);
+  const router = useRouter();
 
-  const onDropRejected = (rejectedFiles: FileRejection[]) => {};
+  const { startUpload } = useUploadThing("imageUploader", {
+    onClientUploadComplete: ([data]) => {
+      const configId = data.serverData.configId;
+      startTransition(() => {
+        router.push(`/configure/design?id=${configId}`);
+      });
+    },
+    onUploadProgress(p) {
+      setUploadProgress(p);
+    },
+  });
 
-  const onDropAccepted = (acceptedFiles: File[]) => {};
+  const onDropRejected = (rejectedFiles: FileRejection[]) => {
+    const [file] = rejectedFiles;
+    setIsDragOver(false);
+  };
+
+  const onDropAccepted = (acceptedFiles: File[]) => {
+    startUpload(acceptedFiles, { configId: undefined });
+    setIsDragOver(false);
+  };
 
   const isUploading = true;
   const [isPanding, startTransition] = useTransition();
@@ -56,7 +76,10 @@ const Page = () => {
                 {isUploading ? (
                   <div className="flex flex-col item-center">
                     <p className="text-center">Uploading...</p>
-                     <Progress value={UploadProgess} className="mt-2 w-40 h-2 bg-gray-200 "/>
+                    <Progress
+                      value={UploadProgess}
+                      className="mt-2 w-40 h-2 bg-gray-200 "
+                    />
                   </div>
                 ) : isPanding ? (
                   <div className="flex flex-col item-center">
@@ -64,17 +87,18 @@ const Page = () => {
                   </div>
                 ) : isDragOver ? (
                   <p>
-                    <span className="font-samibold">Drop file</span>{" "}
-                    to Upload
-                    </p>
+                    <span className="font-samibold">Drop file</span> to Upload
+                  </p>
                 ) : (
                   <p>
-                    <span className="font-samibold">Click to upload</span>{" "}
-                    or drag and drop
-                    </p>
+                    <span className="font-samibold">Click to upload</span> or
+                    drag and drop
+                  </p>
                 )}
               </div>
-              {isPanding ? null : <p className="text-xs text-zinc-500">PNG, JPG, JPEG</p>}
+              {isPanding ? null : (
+                <p className="text-xs text-zinc-500">PNG, JPG, JPEG</p>
+              )}
             </div>
           )}
         </Dropzone>
