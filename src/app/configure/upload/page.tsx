@@ -6,13 +6,16 @@ import { useState, useTransition } from "react";
 import Dropzone, { FileRejection } from "react-dropzone";
 import { Progress } from "@/components/ui/progress";
 import { useUploadThing } from "@/lib/uploadthing";
+import { useToast } from "@/components/ui/use-toast";
+
 
 const Page = () => {
+  const {toast} = useToast();
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const [UploadProgess, setUploadProgress] = useState<number>(45);
   const router = useRouter();
 
-  const { startUpload } = useUploadThing("imageUploader", {
+  const { startUpload, isUploading} = useUploadThing("imageUploader", {
     onClientUploadComplete: ([data]) => {
       const configId = data.serverData.configId;
       startTransition(() => {
@@ -27,14 +30,17 @@ const Page = () => {
   const onDropRejected = (rejectedFiles: FileRejection[]) => {
     const [file] = rejectedFiles;
     setIsDragOver(false);
+    toast({
+      title:`${file.file.type} type is not supported`,
+      description:"please choose a PNG,JPG,JPEG image instead.",
+      variant:'destructive'
+    })
   };
 
-  const onDropAccepted = (acceptedFiles: File[]) => {
-    startUpload(acceptedFiles, { configId: undefined });
-    setIsDragOver(false);
-  };
+  const onDropAccepted = (acceptedFiles:File[]) => {
+    startUpload(acceptedFiles,{configId:undefined});
+  }
 
-  const isUploading = true;
   const [isPanding, startTransition] = useTransition();
 
   return (
@@ -46,7 +52,7 @@ const Page = () => {
         }
       )}
     >
-      <div className="relative flex flex-1 flex-col items-center justify-center w-full">
+      <div className="relative min-h-[calc(100vh-20rem-1px)] flex flex-1 flex-col items-center justify-center w-full">
         <Dropzone
           onDropRejected={onDropRejected}
           onDropAccepted={onDropAccepted}
@@ -78,7 +84,7 @@ const Page = () => {
                     <p className="text-center">Uploading...</p>
                     <Progress
                       value={UploadProgess}
-                      className="mt-2 w-40 h-2 bg-gray-200 "
+                      className="mt-2 w-40 h-2 bg-gray-200 text-green-600 "
                     />
                   </div>
                 ) : isPanding ? (
@@ -105,6 +111,6 @@ const Page = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Page;
