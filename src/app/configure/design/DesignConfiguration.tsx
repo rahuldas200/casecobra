@@ -388,7 +388,7 @@ const DesignConfiguration = ({
                     configId,
                     color: options.color.value,
                     finish: options.finish.value,
-                    material: options.material.value
+                    material: options.material.value,
                     model: options.model.value,
                   });
                 }}
