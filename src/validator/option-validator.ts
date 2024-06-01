@@ -40,11 +40,11 @@ export const MODELS = {
     },
     {
       label:"iphone 13",
-      value:'iphonex13'
+      value:'iphone13'
     },
     {
       label:"iphone 14",
-      value:'iphonex14'
+      value:'iphone14'
     },
     {
       label:"iphone 15",
@@ -53,7 +53,7 @@ export const MODELS = {
   ]
 } as const
 
-export const MATERIAL ={
+export const MATERIALS ={
   name:"material",
   options:[
     {

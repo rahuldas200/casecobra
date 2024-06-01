@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { RadioGroup } from "@headlessui/react";
 import { useState } from "react";
-import { COLORS, FINISHES, MATERIAL } from "@/validator/option-validator";
+import { COLORS, FINISHES, MATERIALS } from "@/validator/option-validator";
 import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
@@ -17,9 +17,15 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { BASE_PRICE } from "@/config/products";
+import { useRef } from "react";
 
 import { MODELS } from "@/validator/option-validator";
 import { ArrowRight, Check, ChevronDown, Radio } from "lucide-react";
+import { useUploadThing } from "@/lib/uploadthing";
+import { useToast } from "@/components/ui/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { saveConfig as _saveConfig, SaveConfigArgs } from "./actions";
+import { useRouter } from "next/navigation";
 
 interface DesignConfigurationProps {
   configId: string;
@@ -31,25 +37,122 @@ const DesignConfiguration = ({
   imageUrl,
   imageDimension,
 }: DesignConfigurationProps) => {
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const { mutate: saveConfig } = useMutation({
+    mutationKey: ["save-config"],
+    mutationFn: async (args: SaveConfigArgs) => {
+      await Promise.all([saveConfiguration(), _saveConfig(args)]);
+    },
+    onError: () => {
+      toast({
+        title: "Something went wrong",
+        description: "There was an error on our end. Please try again",
+        variant: "destructive",
+      });
+    },
+    onSuccess: () => {
+      router.push(`/configure/preview?id=${configId}`);
+    },
+  });
+
   const [options, setOptions] = useState<{
     color: (typeof COLORS)[number];
     model: (typeof MODELS.options)[number];
-    material: (typeof MATERIAL.options)[number];
+    material: (typeof MATERIALS.options)[number];
     finish: (typeof FINISHES.options)[number];
   }>({
-    color: COLORS[1],
+    color: COLORS[0],
     model: MODELS.options[0],
-    material: MATERIAL.options[0],
+    material: MATERIALS.options[0],
     finish: FINISHES.options[0],
   });
 
-  
+  const [renteredDimension, setRenderedDimension] = useState({
+    width: imageDimension.width / 4,
+    height: imageDimension.height / 4,
+  });
+
+  const [renderedPosition, setRenderedPosition] = useState({
+    x: 150,
+    y: 205,
+  });
+
+  const phoneCaseRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { startUpload } = useUploadThing("imageUploader");
+
+  async function saveConfiguration() {
+    try {
+      const {
+        left: caseLeft,
+        top: caseTop,
+        width,
+        height,
+      } = phoneCaseRef.current!.getBoundingClientRect();
+
+      const { left: containerLeft, top: conatinerTop } =
+        containerRef.current!.getBoundingClientRect();
+
+      const leftOffset = caseLeft - containerLeft;
+      const topOffset = caseTop - conatinerTop;
+      const actualX = renderedPosition.x - leftOffset;
+      const actualY = renderedPosition.y - topOffset;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+
+      const userImage = new Image();
+      userImage.crossOrigin = "anonymous";
+      userImage.src = imageUrl;
+
+      await new Promise((resolve) => (userImage.onload = resolve));
+      ctx?.drawImage(
+        userImage,
+        actualX,
+        actualY,
+        renteredDimension.width,
+        renteredDimension.height
+      );
+
+      const base64 = canvas.toDataURL();
+      const base64Data = base64.split(","[1]);
+
+      const blob = base64ToBlob(base64Data, "image/png"); 
+      const file = new File([blob], "filename.png", { type: "image/png" });
+
+      await startUpload([file], { configId });
+    } catch (err) {
+      toast({
+        title: "Something went wrong",
+        description: "There was a problem saving your, please try again.",
+        variant: "destructive",
+      });
+    }
+  }
+
+  function base64ToBlob(base64: string, mimeType: string) {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+  }
 
   return (
     <div className="relative mt-20 grid grid-col-1 lg:grid-cols-3 mb-20 pb-20">
-      <div className="relative h-[37.5rem] overflow-hidden col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+      <div
+        ref={containerRef}
+        className="relative h-[37.5rem] overflow-hidden col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      >
         <div className=" relative w-60 bg-opacity-60 pointer-events-none aspect-[896/1831]">
           <AspectRatio
+            ref={phoneCaseRef}
             ratio={869 / 1831}
             className=" pointer-events-none relative z-50 aspect-[896/1831] w-full"
           >
@@ -75,6 +178,17 @@ const DesignConfiguration = ({
             y: 205,
             height: imageDimension.height / 4,
             width: imageDimension.width / 4,
+          }}
+          onResizeStop={(_, __, ref, ___, { x, y }) => {
+            setRenderedDimension({
+              height: parseInt(ref.style.height.slice(0, -2)),
+              width: parseInt(ref.style.width.slice(0, -2)),
+            });
+            setRenderedPosition({ x, y });
+          }}
+          onDragStop={(_, data) => {
+            const { x, y } = data;
+            setRenderedPosition({ x, y });
           }}
           lockAspectRatio
           resizeHandleComponent={{
@@ -188,7 +302,7 @@ const DesignConfiguration = ({
                   </DropdownMenu>
                 </div>
 
-                {[MATERIAL, FINISHES].map(
+                {[MATERIALS, FINISHES].map(
                   ({ name, options: selectableOption }) => (
                     <RadioGroup
                       key={name}
@@ -268,7 +382,20 @@ const DesignConfiguration = ({
                     100
                 )}
               </p>
-              <Button size="sm" className="w-full">
+              <Button
+                onClick={() => {
+                  saveConfig({
+                    configId,
+                    color: options.color.value,
+                    finish: options.finish.value,
+                    material: options.material.value
+                    model: options.model.value,
+                  });
+                }}
+                size="sm"
+
+                className="w-full"
+              >
                 Continue
                 <ArrowRight className="h-4 w-4 ml-1.5 inline" />
               </Button>
