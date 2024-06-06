@@ -10,12 +10,20 @@ import { BASE_PRICE, PRODUCT_PRICE } from "@/config/products";
 import { formatePrice } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@headlessui/react";
+import { SaveConfigArgs } from "../design/actions";
+import { createCheckoutSession } from "./action";
+import { useRouter } from "next/router";
+import { useToast } from '@/components/ui/use-toast'
 
 export default function DesignPreview({
   configuration,
 }: {
   configuration: Configuration;
 }) {
+
+  const router = useRouter()
+  const {toast} = useToast()
+
   const [showconfetti, setShowConfetti] = useState(false);
   useEffect(() => {
     setShowConfetti(true);
@@ -38,9 +46,25 @@ export default function DesignPreview({
     totalPrice += PRODUCT_PRICE.finish.textured
   }
 
-  const {} = useMutation({
+  const {mutate: createPaymentSession} = useMutation({
     mutationKey:["get-checkout-session"],
-    mutationFn:
+    mutationFn: createCheckoutSession,
+    onSuccess: ({url}) => {
+      if(url){
+        router.push(url)
+      }
+      else {
+        throw new Error('Unable to retrive payment URL')
+      }
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was an error on our end. Please try again.',
+        variant: 'destructive',
+      })
+    },
+
   })
 
   return (
@@ -123,7 +147,7 @@ export default function DesignPreview({
 
                 <div className="my-2 h-px bg-gray-200"/>
 
-                <div className="fkex items-center justify-center py-2">
+                <div className="flex items-center justify-center py-2">
                     <p className="font-semibold text-gray-900">
                         Order total
                     </p>

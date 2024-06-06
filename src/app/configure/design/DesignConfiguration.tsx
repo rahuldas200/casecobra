@@ -43,6 +43,11 @@ const DesignConfiguration = ({
   const { mutate: saveConfig } = useMutation({
     mutationKey: ["save-config"],
     mutationFn: async (args: SaveConfigArgs) => {
+      toast({
+        title: "called successfully",
+        description: "ok done",
+        variant: "destructive",
+      });
       await Promise.all([saveConfiguration(), _saveConfig(args)]);
     },
     onError: () => {
@@ -69,7 +74,7 @@ const DesignConfiguration = ({
     finish: FINISHES.options[0],
   });
 
-  const [renteredDimension, setRenderedDimension] = useState({
+  const [renderedDimension, setRenderedDimension] = useState({
     width: imageDimension.width / 4,
     height: imageDimension.height / 4,
   });
@@ -84,6 +89,7 @@ const DesignConfiguration = ({
   const { startUpload } = useUploadThing("imageUploader");
 
   async function saveConfiguration() {
+    console.log("i am called...1");
     try {
       const {
         left: caseLeft,
@@ -92,11 +98,12 @@ const DesignConfiguration = ({
         height,
       } = phoneCaseRef.current!.getBoundingClientRect();
 
-      const { left: containerLeft, top: conatinerTop } =
+      const { left: containerLeft, top: containerTop } =
         containerRef.current!.getBoundingClientRect();
 
       const leftOffset = caseLeft - containerLeft;
-      const topOffset = caseTop - conatinerTop;
+      const topOffset = caseTop - containerTop;
+
       const actualX = renderedPosition.x - leftOffset;
       const actualY = renderedPosition.y - topOffset;
 
@@ -108,27 +115,29 @@ const DesignConfiguration = ({
       const userImage = new Image();
       userImage.crossOrigin = "anonymous";
       userImage.src = imageUrl;
-
       await new Promise((resolve) => (userImage.onload = resolve));
+
       ctx?.drawImage(
         userImage,
         actualX,
         actualY,
-        renteredDimension.width,
-        renteredDimension.height
+        renderedDimension.width,
+        renderedDimension.height
       );
 
       const base64 = canvas.toDataURL();
-      const base64Data = base64.split(","[1]);
+      const base64Data = base64.split(",")[1];
 
-      const blob = base64ToBlob(base64Data, "image/png"); 
+      const blob = base64ToBlob(base64Data, "image/png");
       const file = new File([blob], "filename.png", { type: "image/png" });
 
       await startUpload([file], { configId });
+      console.log("I am called...2");
     } catch (err) {
+      console.log("I am called... error");
       toast({
         title: "Something went wrong",
-        description: "There was a problem saving your, please try again.",
+        description: "abcd",
         variant: "destructive",
       });
     }
@@ -144,8 +153,10 @@ const DesignConfiguration = ({
     return new Blob([byteArray], { type: mimeType });
   }
 
+ 
+
   return (
-    <div className="relative mt-20 grid grid-col-1 lg:grid-cols-3 mb-20 pb-20">
+    <div className="relative mt-20 grid grid-col-1 lg:grid-cols-3 mb-20 pb-20 w-full">
       <div
         ref={containerRef}
         className="relative h-[37.5rem] overflow-hidden col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
@@ -209,8 +220,8 @@ const DesignConfiguration = ({
           </div>
         </Rnd>
       </div>
-      <div className="h-[37.5rem]  w-full col-span-full lg:col-span-1  flex  flex-col bg-white">
-        <ScrollArea className="realtive flex-1 overflow-auto">
+      <div className="h-[37.5rem] ml-3 w-full col-span-full lg:col-span-1 flex flex-col bg-white">
+        <ScrollArea className="realtive flex-1 overflow-auto w-full">
           <div
             aria-hidden="true"
             className="absolute z-10 inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white pointer-events-none"
@@ -393,7 +404,6 @@ const DesignConfiguration = ({
                   });
                 }}
                 size="sm"
-
                 className="w-full"
               >
                 Continue

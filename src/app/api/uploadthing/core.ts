@@ -31,7 +31,7 @@ export const ourFileRouter = {
         return {configId:configuration.id}
       }
       else{
-        const updatedConfiguration = await db.configuration.updare({
+        const updatedConfiguration = await db.configuration.update({
           where:{
             id:configId
           },
@@ -39,9 +39,8 @@ export const ourFileRouter = {
             croppedImageUrl:file.url
           },
         })
-        return {configId:configuration.id}
+        return {configId:updatedConfiguration.id}
       }
-        return {configId}
     }),
 } satisfies FileRouter
 
