@@ -12,6 +12,7 @@ interface PageProps{
 export default async function  Page({searchParams}:PageProps) {
 
     const {id}= searchParams
+    console.log(id);
 
     if(!id || typeof id !== 'string'){
         return notFound();

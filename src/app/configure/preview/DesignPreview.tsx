@@ -12,24 +12,31 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@headlessui/react";
 import { SaveConfigArgs } from "../design/actions";
 import { createCheckoutSession } from "./action";
-import { useRouter } from "next/router";
-import { useToast } from '@/components/ui/use-toast'
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+import {useKindeBrowserClient} from '@kinde-oss/kinde-auth-nextjs'
+import LoginModal from "@/components/LoginModal";
 
 export default function DesignPreview({
   configuration,
 }: {
   configuration: Configuration;
 }) {
+  console.log(configuration.croppedImageUrl);
 
-  const router = useRouter()
-  const {toast} = useToast()
+  const router = useRouter();
+  const { toast } = useToast();
+  const {id} = configuration
+  const {user} = useKindeBrowserClient()
 
   const [showconfetti, setShowConfetti] = useState(false);
+  const [isLoginModelOpen, setisLoginModelOpen] = useState<boolean>(false)
+
   useEffect(() => {
     setShowConfetti(true);
   });
 
-  const { color, model, finish,material } = configuration;
+  const { color, model, finish, material } = configuration;
   const tw = COLORS.find(
     (supportedColor) => supportedColor.value === color
   )?.tw;
@@ -38,37 +45,46 @@ export default function DesignPreview({
     ({ value }) => value === model
   )!;
 
-  let totalPrice = BASE_PRICE
-  if(material === 'polycarbonate'){
-    totalPrice += PRODUCT_PRICE.material.polycarbonate
+  let totalPrice = BASE_PRICE;
+  if (material === "polycarbonate") {
+    totalPrice += PRODUCT_PRICE.material.polycarbonate;
   }
-  if(finish === 'textured'){
-    totalPrice += PRODUCT_PRICE.finish.textured
+  if (finish === "textured") {
+    totalPrice += PRODUCT_PRICE.finish.textured;
   }
 
-  const {mutate: createPaymentSession} = useMutation({
-    mutationKey:["get-checkout-session"],
+  const { mutate: createPaymentSession } = useMutation({
+    mutationKey: ["get-checkout-session"],
     mutationFn: createCheckoutSession,
-    onSuccess: ({url}) => {
-      if(url){
-        router.push(url)
-      }
-      else {
-        throw new Error('Unable to retrive payment URL')
+    onSuccess: ({ url }) => {
+      if (url) {
+        router.push(url);
+      } else {
+        throw new Error("Unable to retrive payment URL");
       }
     },
     onError: () => {
       toast({
-        title: 'Something went wrong',
-        description: 'There was an error on our end. Please try again.',
-        variant: 'destructive',
-      })
+        title: "Something went wrong",
+        description: "There was an error on our end. Please try again.",
+        variant: "destructive",
+      });
     },
+  });
 
-  })
+  const handleCheckout = () => {
+    if(user){
+      createPaymentSession({configId:id})
+    } 
+    else {
+      // need to login
+      localStorage.setItem('configurationId',id);
+      setisLoginModelOpen(true)
+    }
+  }
 
   return (
-    <>
+    <div className="flex  flex-col">
       <div
         aria-hidden="true"
         className="pointer-events-none select-none absolute inset-0 overflow-hidden flex justify-center"
@@ -77,17 +93,18 @@ export default function DesignPreview({
           active={showconfetti}
           config={{ elementCount: 200, spread: 90 }}
         />
+      </div> 
+      <LoginModal isOpen={isLoginModelOpen} setIsOpen={setisLoginModelOpen} />
+
+      <div className="w-full flex justify-center items-center mt-20">
+        <Phone
+          className={cn(`bg-${tw} w-[35%] sm:w-[30%] md:w-[25%] lg:w-[20%]`)}
+          imgSrc={configuration.croppedImageUrl!}
+        />
       </div>
 
-      <div className="mt-20 grid grid-cols-1 text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-12">
-        <div className="sm:col-span-4 md:col-span-3 md:row-span-2 md:row-end-2">
-          <Phone
-            className={cn(`bg-${tw}`)}
-            imgSrc={configuration.croppedImageUrl!}
-          />
-        </div>
-
-        <div className="mt-6 sm:col-span-9 sm:mt-0 md:row-emd-1">
+      <div className="mt-20">
+        <div className="mt-6 sm:col-span-9 sm:mt-2 md:row-end-1">
           <h3 className="text-3xl font-bold tracking-tight text-gray-900">
             Your {modelLabel} Case
           </h3>
@@ -100,7 +117,7 @@ export default function DesignPreview({
         <div className="sm:col-span-12 md:col-span-9 text-base">
           <div className=" ggrid grid-cols-1 gap-y-8 border-b border-gray-200 py-8 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
             <div>
-              <p className="font-medium text-zinc-950 ">Highlights</p>
+              <p className="font-bold text-zinc-950 ">Highlights</p>
               <ol className="mt-3 text-zinc-700 list-disc list-inside">
                 <li>Wireless charging compatible</li>
                 <li>TPU shock absorption</li>
@@ -108,8 +125,8 @@ export default function DesignPreview({
                 <li>5 year print warrenty</li>
               </ol>
             </div>
-            <div>
-              <p className="font-medium text-zinc-700 "> Material</p>
+            <div className="mt-3">
+              <p className="font-bold text-zinc-700 "> Material</p>
               <ol className="mt-3 text-zinc-700 list-disc list-inside">
                 <li>High-quality, durable material</li>
                 <li>Scratch and fingerprint resistant coating</li>
@@ -145,26 +162,26 @@ export default function DesignPreview({
                   </div>
                 ) : null}
 
-                <div className="my-2 h-px bg-gray-200"/>
+                <div className="my-2 h-px bg-gray-200" />
 
                 <div className="flex items-center justify-center py-2">
-                    <p className="font-semibold text-gray-900">
-                        Order total
-                    </p>
-                    <p className="font-semibold text-gray-900">{formatePrice(totalPrice/100)}</p>
+                  <p className="font-semibold text-gray-900">Order total</p>
+                  <p className="font-semibold text-gray-900">
+                    {" "}
+                    {formatePrice(totalPrice / 100)}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 flex justify-end pb-12">
-                <Button className='px-4 sm:px-6 lg:px-8'>
-                    Check out <ArrowRight className="h-4 w-4 ml-1.5 inline"/>
-                </Button>
-
+            <div className="mt-8 flex justify-end pb-12 text-white">
+              <Button onClick={()=> handleCheckout()} className="px-4 py-2.5 rounded-md sm:px-6 lg:px-8 bg-green-600">
+                Check out <ArrowRight className="h-4 w-4 ml-1.5 inline" />
+              </Button>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -23,11 +23,11 @@ const Navbar = async () => {
           <div className="h-full flex items-center  space-x-4">
             {user ? (
               <>
-                <Link href="/dashboard" className="">
-                  <Button title={"Sign out"} />
+                <Link href="/api/auth/logout" className="">
+                  <Button title={"Logout"} />
                 </Link>
                 {isAdmin ? (
-                  <Link href="/api/auth/logout" className="">
+                  <Link href="/dashboard" className="">
                     <Button title={"Dashboard"} />
                   </Link>
                 ) : null}

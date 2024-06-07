@@ -19,6 +19,8 @@ export const createCheckoutSession = async ({configId}:{configId:string}) =>{
 
     const user = await getUser();
 
+    console.log(user);
+
     if(!user){
         throw new Error ('You need to be logged in')
     }
@@ -43,9 +45,12 @@ export const createCheckoutSession = async ({configId}:{configId:string}) =>{
         }
     })
 
+    console.log(existingorder)
+
     if(existingorder){
         order = existingorder
     } else {
+        console.log("start",configuration.id)
         order = await db.order.create({
             data:{
                 amount:price /100,
@@ -53,6 +58,7 @@ export const createCheckoutSession = async ({configId}:{configId:string}) =>{
                 configurationId:configuration.id,
             }
         })
+        console.log("end...")
     }
 
     const product = await stripe.products.create({

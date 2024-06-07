@@ -129,7 +129,7 @@ export default function Home() {
               What our{" "}
               <span className=" relative px-2">
                 customer{" "}
-                <Icons.underline className="hidden sm:block pointer-events-none absolute inset-x-0 -bottom-6 text-green-500" />
+                <Icons.underline className ="hidden sm:block pointer-events-none absolute inset-x-0 -bottom-6 text-green-500" />
               </span>{" "}
               say
             </h2>
@@ -148,61 +148,63 @@ export default function Home() {
               <Star className="h-5 text-green-600 fill-green-600" />
               <Star className="h-5 text-green-600 fill-green-600" />
             </div>
-            <div className="bg-gray-300 p-5 rounded-md">
-              <div className="text-lg leading-8">
-                <p>
-                  "The case feels durable and I even got a compliment on the
-                  design. Had the case two and half months now{" "}
-                  <span className=" p-0.5 bg-slate-800 text-white">
-                    Image is super clear
-                  </span>
-                  , on the case I had before, the image started fading into
-                  yellow-ish color after a cuple weeks. Love it "
-                </p>
-              </div>
+            <div className="flex flex-col gap-10 sm:flex-row md:flex-row xl:flex-row">
+              <div className="bg-gray-300 p-5 rounded-md">
+                <div className="text-lg leading-8">
+                  <p>
+                    "The case feels durable and I even got a compliment on the
+                    design. Had the case two and half months now{" "}
+                    <span className=" p-0.5 bg-slate-800 text-white">
+                      Image is super clear
+                    </span>
+                    , on the case I had before, the image started fading into
+                    yellow-ish color after a cuple weeks. Love it "
+                  </p>
+                </div>
 
-              <div className=" flex gap-4 mt-2">
-                <img
-                  src="/users/user-1.png"
-                  alt=""
-                  className="rounded-full h-12 object-cover"
-                />
+                <div className=" flex gap-4 mt-5">
+                  <img
+                    src="/users/user-1.png"
+                    alt=""
+                    className="rounded-full h-12 object-cover"
+                  />
 
-                <div className="flex flex-col ">
-                  <p className=" font-semibold">Jonathan</p>
-                  <div className="flex gap-1.5 items-center tetx-zinc-600">
-                    <Check className="h-4 w-4 strock-[3px] text-green-600" />
-                    <p className="text-sm">Verified Purchase</p>
+                  <div className="flex flex-col ">
+                    <p className=" font-semibold">Jonathan</p>
+                    <div className="flex gap-1.5 items-center tetx-zinc-600">
+                      <Check className="h-4 w-4 strock-[3px] text-green-600" />
+                      <p className="text-sm">Verified Purchase</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-gray-300 p-5 rounded-md">
-              <div className="text-lg leading-8 mt-5 ">
-                <p>
-                  "The case feels durable and I even got a compliment on the
-                  design. Had the case two and half months now{" "}
-                  <span className=" p-0.5 bg-slate-800 text-white">
-                    Image is super clear
-                  </span>
-                  , on the case I had before, the image started fading into
-                  yellow-ish color after a cuple weeks. Love it "
-                </p>
-              </div>
+              <div className="bg-gray-300 p-5 rounded-md">
+                <div className="text-lg leading-8 mt-5 ">
+                  <p>
+                    "The case feels durable and I even got a compliment on the
+                    design. Had the case two and half months now{" "}
+                    <span className=" p-0.5 bg-slate-800 text-white">
+                      Image is super clear
+                    </span>
+                    , on the case I had before, the image started fading into
+                    yellow-ish color after a cuple weeks. Love it "
+                  </p>
+                </div>
 
-              <div className=" flex gap-4 mt-2">
-                <img
-                  src="/users/user-1.png"
-                  alt=""
-                  className="rounded-full h-12 object-cover"
-                />
+                <div className=" flex gap-4 mt-2">
+                  <img
+                    src="/users/user-1.png"
+                    alt=""
+                    className="rounded-full h-12 object-cover"
+                  />
 
-                <div className="flex flex-col ">
-                  <p className=" font-semibold">Jonathan</p>
-                  <div className="flex gap-1.5 items-center tetx-zinc-600">
-                    <Check className="h-4 w-4 strock-[3px] text-green-600" />
-                    <p className="text-sm">Verified Purchase</p>
+                  <div className="flex flex-col ">
+                    <p className=" font-semibold">Jonathan</p>
+                    <div className="flex gap-1.5 items-center tetx-zinc-600">
+                      <Check className="h-4 w-4 strock-[3px] text-green-600" />
+                      <p className="text-sm">Verified Purchase</p>
+                    </div>
                   </div>
                 </div>
               </div>
