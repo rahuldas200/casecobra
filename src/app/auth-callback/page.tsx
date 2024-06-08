@@ -1,10 +1,11 @@
+'use client'
 import React, { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
 import { getAuthStatus } from './actions';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
-const page = () => {
+const Page = () => {
   const [configId,setConfigId] = useState<string | null>(null)
 
   const router = useRouter();
@@ -46,4 +47,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

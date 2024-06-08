@@ -94,7 +94,6 @@ export default function DesignPreview({
           config={{ elementCount: 200, spread: 90 }}
         />
       </div> 
-      <LoginModal isOpen={isLoginModelOpen} setIsOpen={setisLoginModelOpen} />
 
       <div className="w-full flex justify-center items-center mt-20">
         <Phone
@@ -102,6 +101,8 @@ export default function DesignPreview({
           imgSrc={configuration.croppedImageUrl!}
         />
       </div>
+
+
 
       <div className="mt-20">
         <div className="mt-6 sm:col-span-9 sm:mt-2 md:row-end-1">
@@ -173,6 +174,7 @@ export default function DesignPreview({
                 </div>
               </div>
             </div>
+            <LoginModal isOpen={isLoginModelOpen} setIsOpen={setisLoginModelOpen} />
 
             <div className="mt-8 flex justify-end pb-12 text-white">
               <Button onClick={()=> handleCheckout()} className="px-4 py-2.5 rounded-md sm:px-6 lg:px-8 bg-green-600">

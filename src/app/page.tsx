@@ -9,7 +9,7 @@ import user_4 from "../../public/users/user-4.jpg";
 import user_5 from "../../public/users/user-5.jpg";
 import { Star } from "lucide-react";
 import Phone from "@/components/Phone";
-import { Icons } from "@/components/Icons";
+import { Icons } from '@/components/Icons'
 import { Reviews } from "@/components/Reviews";
 import Link from "next/link";
 
@@ -125,12 +125,12 @@ export default function Home() {
         <MaxWidthWrapper className="flex flex-col items-center gap-16 sm:gap-32 ">
           <div className=" flex flex-col lg:flex-row items-center gap-4 sm:gap-6">
             <h2 className="order-1 mt-2 tracking-tight text-center text-balance leading-tight font-bold text-5xl md:text-6xl text-gray-900">
-              {" "}
-              What our{" "}
+              {' '}
+              What our{' '}
               <span className=" relative px-2">
-                customer{" "}
-                <Icons.underline className ="hidden sm:block pointer-events-none absolute inset-x-0 -bottom-6 text-green-500" />
-              </span>{" "}
+                customer{' '}
+               
+              </span>{' '}
               say
             </h2>
             <img
