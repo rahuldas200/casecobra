@@ -13,6 +13,7 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       const { configId } = metadata.input
+      console.log(configId);
 
       const res = await fetch(file.url)
       const buffer = await res.arrayBuffer()
