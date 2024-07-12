@@ -6,6 +6,7 @@ import {stripe} from '@/lib/stripe'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 
 export const createCheckoutSession = async ({configId}:{configId:string}) =>{
+ 
     const configuration = await db.configuration.findUnique({
         where:{
            id: configId
@@ -18,8 +19,6 @@ export const createCheckoutSession = async ({configId}:{configId:string}) =>{
     const {getUser} = getKindeServerSession()
 
     const user = await getUser();
-
-    console.log(user);
 
     if(!user){
         throw new Error ('You need to be logged in')
@@ -45,7 +44,7 @@ export const createCheckoutSession = async ({configId}:{configId:string}) =>{
         }
     })
 
-    console.log(existingorder)
+    console.log(" ok ----> ",existingorder)
 
     if(existingorder){
         order = existingorder
@@ -73,7 +72,7 @@ export const createCheckoutSession = async ({configId}:{configId:string}) =>{
     const stripSession = await stripe.checkout.sessions.create({
         success_url:`${process.env.NEXT_PUBLIC_SERVER_URL}/thank-you?orderId=${order.id}`,
         cancel_url:`${process.env.NEXT_PUBLIC_SERVER_URL}/configure/preview?id=${configuration.id}`,
-        payment_method_types:['card','paypal'],
+        payment_method_types:['card'],
         mode:"payment",
         shipping_address_collection:{
             allowed_countries:['IN','US','DE']
@@ -85,6 +84,8 @@ export const createCheckoutSession = async ({configId}:{configId:string}) =>{
 
         line_items:[{price:product.default_price as string,quantity:1}],
     })
+
+    console.log(stripSession)
 
     return {url: stripSession.url}
 

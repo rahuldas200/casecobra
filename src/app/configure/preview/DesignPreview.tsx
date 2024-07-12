@@ -54,7 +54,7 @@ export default function DesignPreview({
   }
 
   const { mutate: createPaymentSession } = useMutation({
-    mutationKey: ["get-checkout-session"],
+    mutationKey: ['get-checkout-session'],
     mutationFn: createCheckoutSession,
     onSuccess: ({ url }) => {
       if (url) {
