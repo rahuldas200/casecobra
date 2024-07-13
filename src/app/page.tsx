@@ -45,6 +45,7 @@ export default function Home() {
             <div className=" relative mx-auto text-center lg:text-left flex flex-col lg:items-start items-center">
               <div className=" absolute w-28 left-0 -top-20 hidden lg:block">
                 <Image src={sanke1} alt="/" className="w-full" />
+                
               </div>
               <h1 className="relative w-fit tracking-tight text-balance mt-16 font-bold leading-tight text-gray-900 text-5xl md:text-^xl lg:text-7xl">
                 Your Image on a{" "}

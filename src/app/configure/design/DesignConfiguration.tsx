@@ -40,14 +40,12 @@ const DesignConfiguration = ({
   const { toast } = useToast();
   const router = useRouter();
 
-  const { mutate: saveConfig } = useMutation({
+  const [loading , setLoading] = useState(false);
+
+  const { mutate: saveConfig,isPending } = useMutation({
     mutationKey: ["save-config"],
     mutationFn: async (args: SaveConfigArgs) => {
-      toast({
-        title: "called successfully",
-        description: "ok done",
-        variant: "destructive",
-      });
+      setLoading(true);
       await Promise.all([saveConfiguration(), _saveConfig(args)]);
     },
     onError: () => {
@@ -59,6 +57,7 @@ const DesignConfiguration = ({
     },
     onSuccess: () => {
       router.push(`/configure/preview?id=${configId}`);
+      setLoading(false);
     },
   });
 
@@ -89,7 +88,6 @@ const DesignConfiguration = ({
   const { startUpload } = useUploadThing("imageUploader");
 
   async function saveConfiguration() {
-    console.log("i am called...1");
     try {
       const {
         left: caseLeft,
@@ -132,9 +130,7 @@ const DesignConfiguration = ({
       const file = new File([blob], "filename.png", { type: "image/png" });
 
       await startUpload([file], { configId });
-      console.log("I am called...2");
     } catch (err) {
-      console.log("I am called... error");
       toast({
         title: "Something went wrong",
         description: "abcd",
