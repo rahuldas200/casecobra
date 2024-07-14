@@ -5,9 +5,11 @@ import { db } from "@/db";
 import { NextResponse } from "next/server";
 import { Resend } from 'resend'
 import OrderReceivedEmail from '@/components/emails/OrderReceiveEmail';
+import { any } from 'zod';
 
 
 const resend = new Resend(process.env.RESEND_EMAIL_API_KEY)
+let userEmail:string ;
 
 export async function POST(req: Request) {
     try {
@@ -27,7 +29,10 @@ export async function POST(req: Request) {
             if (!event.data.object.customer_details?.email) {
                 throw new Error('missing user email')
             }
+
+            userEmail = event.data.object.customer_details?.email
         }
+
 
         const session = event.data.object as Stripe.Checkout.Session
 
@@ -77,7 +82,7 @@ export async function POST(req: Request) {
 
         await resend.emails.send({
             from: "CaseCobra <rahuldas.sde@gmail.com>",
-            to: [event.data.object.customer_details.email],
+            to: [userEmail],
             subject: "Thanks for your order",
             react: OrderReceivedEmail({
                 orderId,
