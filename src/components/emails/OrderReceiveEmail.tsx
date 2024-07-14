@@ -8,7 +8,7 @@ const OrderReceivedEmail = ({
     orderId,
     orderDate,
 }: {
-    shippingAddress: ShipingAddress,
+    shippingAddress: any,
     orderId: string,
     orderDate:string,
 }) => {

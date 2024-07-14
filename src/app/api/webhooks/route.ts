@@ -9,6 +9,7 @@ import { any } from 'zod';
 
 
 const resend = new Resend(process.env.RESEND_EMAIL_API_KEY)
+
 let userEmail:string ;
 
 export async function POST(req: Request) {
